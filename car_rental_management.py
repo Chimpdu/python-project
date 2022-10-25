@@ -1,5 +1,6 @@
 from datetime import datetime,timedelta
 import math
+
 def menu():
     while True:
         print("You may select one of the following:\n1) List available cars\n2) Rent a car\n\
@@ -144,7 +145,6 @@ def rent_car():
         else:
             reported_birthday=input("Please write down your birthday.\n")
             if reported_birthday[2]=="/" and reported_birthday[5]=="/":
-                
                 given_date=int(reported_birthday[:2].lstrip("0"))
                 given_month=int(reported_birthday[3:5].lstrip("0"))
                 if 1<=given_date<=31 and 1<=given_month<=12:
@@ -162,8 +162,6 @@ def rent_car():
                                 if reported_birthday==info[0]:
                                     print("Hello {}\nYou rented\
  the car {}".format(info[1],requested_reg_nr))
-
-                        
                         else:
                             firstname=input("Please write down your first name:\n")
                             surname=input("Please write down your surname:\n")
@@ -222,7 +220,7 @@ def count_money():
         total=total+money_0
     print("The total amount of money is {:.2f} euros".format(total))
 
-        
+menu()        
             
 
 
