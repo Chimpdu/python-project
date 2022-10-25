@@ -12,7 +12,7 @@ def menu():
         elif selection==3:
             return_car()
         elif selection==4:
-            count_money
+            count_money()
         elif selection==0:
             break
         else:
@@ -207,7 +207,25 @@ def return_car():
             return_time=datetime.now()
             add_new_transaction(return_reg_nr,birthday,start_time,return_time,daily_price)
 
-return_car()
+def count_money():
+    f=open("transActions.txt","r")
+    money=[]
+    while True:
+        row=f.readline().strip("\n").split(",")
+        if len(row)<6:
+            break
+        else:
+            money_0=int(row[-1][:-3])
+            money.append(money_0)
+    total=0
+    for money_0 in money:
+        total=total+money_0
+    print("The total amount of money is {:.2f} euros".format(total))
+
+        
+            
+
+
 
                 
                         
