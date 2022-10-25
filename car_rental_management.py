@@ -93,7 +93,29 @@ def add_new_rented_car(reg_nr,birthday):
             content=car[0]+","+birthday+","+now
             f.write(content)
     f.close()
-            
+
+def add_new_transaction(reg_nr,birthday,start_time,end_time,daily_price):
+    start=datetime.strptime(start_time,"%d/%m/%Y %H:%M")
+    duration=math.floor((end_time-start).total_seconds()/60/60/24)
+    end_time_str=end_time.strftime("%d/%m/%Y %H:%M")
+    total_money=duration*int(daily_price)
+    f=open("transActions.txt",'a')
+    data="{},{},{},{},{},{:.2f}".format(reg_nr,birthday,start_time,end_time_str,duration,total_money)
+    f.write(data)
+    f.close()
+
+def remove_rented_cars(reg_nr):
+    all_infos=get_rented_cars_info()
+    for info in all_infos:
+        if info[0]==reg_nr:
+            all_infos.remove(info)
+    f=open("RentedVehicles.txt","w")
+    datas=''
+    for info in all_infos:
+        data=info[0]+","+info[1]+","+info[2]+"\n"
+        datas=datas+data
+    f.write(datas)
+    f.close()
 
 def list_available_cars():
     all_cars_list=get_all_cars_info()
@@ -162,11 +184,36 @@ def rent_car():
     else:
         print("Sorry, the register number you submitted is invalid.")
 
+def return_car():
+    return_reg_nr=input("Please write down the register number of the vehicle to be returned.\n")
+    rented_cars_info=get_rented_cars_info()
+    all_reg_nr=get_all_reg_nr()
+    rented_reg_nr=get_rented_reg_nr()
+    all_cars_info=get_all_cars_info()
+    if return_reg_nr not in all_reg_nr:
+        print("Sorry the register number you provided does not exist.")
+    else:
+        if return_reg_nr not in rented_reg_nr:
+            print("Sorry, this car is not rented.")
+        else:
+            for rented_car in rented_cars_info:
+                if rented_car[0]==return_reg_nr:
+                    start_time=rented_car[-1]
+                    birthday=rented_car[-2]
+                    remove_rented_cars(rented_car[0])
+            for car in all_cars_info:
+                if car[0]==return_reg_nr:
+                    daily_price=car[2]
+            return_time=datetime.now()
+            add_new_transaction(return_reg_nr,birthday,start_time,return_time,daily_price)
+
+return_car()
+
+                
+                        
 
 
 
-list_available_cars()
-rent_car()
 
     
     
