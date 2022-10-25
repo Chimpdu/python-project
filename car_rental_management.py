@@ -63,7 +63,7 @@ def get_customers_info():
     customers_info=[]
     while True:
         customer_info_str=f.readline().strip("\n")
-        if len(customer_info)<=0:
+        if len(customer_info_str)<=0:
             break
         else:
             customer_list=customer_info_str.split(",")
@@ -83,12 +83,15 @@ def add_new_customer(birthday,firstname,surname,email):
     f.write(new_info)
     f.close()
 
-def add_new_rented_car(reg_nr):
+def add_new_rented_car(reg_nr,birthday):
     f=open("RentedVehicles.txt",'a')
     all_cars=get_all_cars_info()
     for car in all_cars:
         if reg_nr==car[0]:
-            f.write(car)
+            time=datetime.now()
+            now=time.strftime("%d/%m/%Y %H:%M")
+            content=car[0]+","+birthday+","+now
+            f.write(content)
     f.close()
             
 
@@ -119,8 +122,9 @@ def rent_car():
         else:
             reported_birthday=input("Please write down your birthday.\n")
             if reported_birthday[2]=="/" and reported_birthday[5]=="/":
-                given_date=int(reported_birthday[:1].lstrp("0"))
-                given_month=int(reported_birthday[3:4].lstrp("0"))
+                
+                given_date=int(reported_birthday[:2].lstrip("0"))
+                given_month=int(reported_birthday[3:5].lstrip("0"))
                 if 1<=given_date<=31 and 1<=given_month<=12:
                     birth_time=datetime.strptime(reported_birthday,"%d/%m/%Y")
                     year_end=datetime.strptime("31/12/2022","%d/%m/%Y")
@@ -130,12 +134,12 @@ def rent_car():
                     if 18<=diff_1<100 and 18<=diff_2<100:
                         existing_customers=get_customers_birthday()
                         if reported_birthday in existing_customers:
-                            add_new_rented_car(requested_reg_nr)
+                            add_new_rented_car(requested_reg_nr,reported_birthday)
                             all_info=get_customers_info()
                             for info in all_info:
                                 if reported_birthday==info[0]:
                                     print("Hello {}\nYou rented\
-the car {}".format(info[1],requested_reg_nr))
+ the car {}".format(info[1],requested_reg_nr))
 
                         
                         else:
@@ -144,8 +148,8 @@ the car {}".format(info[1],requested_reg_nr))
                             email=input("Please leave your e-mail address:\n")
                             if "@" in email and "." in email:
                                 add_new_customer(reported_birthday,firstname,surname,email)
-                                add_new_rented_car(requested_reg_nr)
-                                print("Hello {}\n You rented the car\
+                                add_new_rented_car(requested_reg_nr,reported_birthday)
+                                print("Hello {}\nYou rented the car \
 {}".format(firstname,requested_reg_nr))
                             else:
                                 print("Sorry, email address is invalid.")
