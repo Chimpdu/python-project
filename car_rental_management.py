@@ -5,16 +5,16 @@ def menu():
     while True:
         print("You may select one of the following:\n1) List available cars\n2) Rent a car\n\
 3) Return a car\n4) Count the money\n0) Exit")
-        selection=int(input("What is your selection?\n"))
-        if selection==1:
+        selection=input("What is your selection?\n")
+        if selection=="1":
             list_available_cars()
-        elif selection==2:
+        elif selection=="2":
             rent_car()
-        elif selection==3:
+        elif selection=="3":
             return_car()
-        elif selection==4:
+        elif selection=="4":
             count_money()
-        elif selection==0:
+        elif selection=="0":
             break
         else:
             print("Invalid selection, try again.")
@@ -40,7 +40,7 @@ def get_all_reg_nr():
     return all_reg_nr
     
 def get_rented_cars_info():
-    f=open("RentedVehicles.txt",'r')
+    f=open("rentedVehicles.txt",'r')
     rented_cars_info=[]
     while True:
         rented_cars_str=f.readline().strip("\n")
@@ -85,7 +85,7 @@ def add_new_customer(birthday,firstname,surname,email):
     f.close()
 
 def add_new_rented_car(reg_nr,birthday):
-    f=open("RentedVehicles.txt",'a')
+    f=open("rentedVehicles.txt",'a')
     all_cars=get_all_cars_info()
     for car in all_cars:
         if reg_nr==car[0]:
@@ -95,13 +95,22 @@ def add_new_rented_car(reg_nr,birthday):
             f.write(content)
     f.close()
 
-def add_new_transaction(reg_nr,birthday,start_time,end_time,daily_price):
+def calculate_duration(start_time,end_time):
     start=datetime.strptime(start_time,"%d/%m/%Y %H:%M")
-    duration=math.floor((end_time-start).total_seconds()/60/60/24)
+    lasting_time=math.floor((end_time-start).total_seconds()/60/60/24)
+    return lasting_time
+
+def calculate_cost(start_time,end_time,daily_price):
+    time=calculate_duration(start_time,end_time)
+    total_money=time*int(daily_price)
+    return total_money
+
+def add_new_transaction(reg_nr,birthday,start_time,end_time,daily_price):
+    duration=calculate_duration(start_time,end_time)
     end_time_str=end_time.strftime("%d/%m/%Y %H:%M")
-    total_money=duration*int(daily_price)
+    cost=calculate_cost(start_time,end_time,daily_price)
     f=open("transActions.txt",'a')
-    data="{},{},{},{},{},{:.2f}".format(reg_nr,birthday,start_time,end_time_str,duration,total_money)
+    data="{},{},{},{},{},{:.2f}".format(reg_nr,birthday,start_time,end_time_str,duration,cost)
     f.write(data)
     f.close()
 
@@ -110,7 +119,7 @@ def remove_rented_cars(reg_nr):
     for info in all_infos:
         if info[0]==reg_nr:
             all_infos.remove(info)
-    f=open("RentedVehicles.txt","w")
+    f=open("rentedVehicles.txt","w")
     datas=''
     for info in all_infos:
         data=info[0]+","+info[1]+","+info[2]+"\n"
@@ -136,14 +145,14 @@ def list_available_cars():
         print(string.strip(", "))
 
 def rent_car():
-    requested_reg_nr=input("Please write down the register number of the car you want to rent.\n")
+    requested_reg_nr=input("Give the register number of the car your want to rent:\n")
     all_cars_reg_nr=get_all_reg_nr()
     rented_cars_reg_nr=get_rented_reg_nr()
     if requested_reg_nr in all_cars_reg_nr:
         if requested_reg_nr in rented_cars_reg_nr:
             print("Sorry, this car has already been rented.")
         else:
-            reported_birthday=input("Please write down your birthday.\n")
+            reported_birthday=input("Please enter you birthday in the form DD/MM/YYYY:\n")
             if reported_birthday[2]=="/" and reported_birthday[5]=="/":
                 given_date=int(reported_birthday[:2].lstrip("0"))
                 given_month=int(reported_birthday[3:5].lstrip("0"))
@@ -183,7 +192,7 @@ def rent_car():
         print("Sorry, the register number you submitted is invalid.")
 
 def return_car():
-    return_reg_nr=input("Please write down the register number of the vehicle to be returned.\n")
+    return_reg_nr=input("Give the register number of the car your want to return:\n")
     rented_cars_info=get_rented_cars_info()
     all_reg_nr=get_all_reg_nr()
     rented_reg_nr=get_rented_reg_nr()
@@ -204,6 +213,9 @@ def return_car():
                     daily_price=car[2]
             return_time=datetime.now()
             add_new_transaction(return_reg_nr,birthday,start_time,return_time,daily_price)
+            duration=calculate_duration(start_time,return_time)
+            cost=calculate_cost(start_time,return_time,daily_price)
+            print("The rent lasted {} days and the cost is {:.2f} euros".format(duration,cost))
 
 def count_money():
     f=open("transActions.txt","r")
