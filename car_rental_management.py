@@ -148,48 +148,44 @@ def rent_car():
     requested_reg_nr=input("Give the register number of the car your want to rent:\n")
     all_cars_reg_nr=get_all_reg_nr()
     rented_cars_reg_nr=get_rented_reg_nr()
-    if requested_reg_nr in all_cars_reg_nr:
+    if requested_reg_nr not in all_cars_reg_nr:
+        print("Sorry, the register number you submitted is invalid.")
+    else:
         if requested_reg_nr in rented_cars_reg_nr:
             print("Sorry, this car has already been rented.")
         else:
             reported_birthday=input("Please enter you birthday in the form DD/MM/YYYY:\n")
-            if reported_birthday[2]=="/" and reported_birthday[5]=="/":
-                given_date=int(reported_birthday[:2].lstrip("0"))
-                given_month=int(reported_birthday[3:5].lstrip("0"))
-                if 1<=given_date<=31 and 1<=given_month<=12:
-                    birth_time=datetime.strptime(reported_birthday,"%d/%m/%Y")
-                    year_end=datetime.strptime("31/12/2022","%d/%m/%Y")
-                    year_start=datetime.strptime("01/01/2022","%d/%m/%Y")
-                    diff_1=math.floor(((year_end-birth_time).total_seconds())/60/60/24/365)
-                    diff_2=math.floor(((year_start-birth_time).total_seconds())/60/60/24/365)
-                    if 18<=diff_1<100 and 18<=diff_2<100:
-                        existing_customers=get_customers_birthday()
-                        if reported_birthday in existing_customers:
-                            add_new_rented_car(requested_reg_nr,reported_birthday)
-                            all_info=get_customers_info()
-                            for info in all_info:
-                                if reported_birthday==info[0]:
-                                    print("Hello {}\nYou rented\
- the car {}".format(info[1],requested_reg_nr))
-                        else:
-                            firstname=input("Please write down your first name:\n")
-                            surname=input("Please write down your surname:\n")
-                            email=input("Please leave your e-mail address:\n")
-                            if "@" in email and "." in email:
-                                add_new_customer(reported_birthday,firstname,surname,email)
-                                add_new_rented_car(requested_reg_nr,reported_birthday)
-                                print("Hello {}\nYou rented the car \
-{}".format(firstname,requested_reg_nr))
-                            else:
-                                print("Sorry, email address is invalid.")
-                    else: print("You cannot rent cars due to your age.")
+            try:
+                birth_time=datetime.strptime(reported_birthday,"%d/%m/%Y")
+                year_end=datetime.strptime("31/12/2022","%d/%m/%Y")
+                year_start=datetime.strptime("01/01/2022","%d/%m/%Y")
+                diff_1=math.floor(((year_end-birth_time).total_seconds())/60/60/24/365)
+                diff_2=math.floor(((year_start-birth_time).total_seconds())/60/60/24/365)
+                if 18>diff_1 or diff_1>=100 and 18>diff_2 or diff_2>=100:
+                     print("You cannot rent cars due to your age.")
                 else:
-                    print("Sorry, the date given is insensible.")
-                
-            else:
+                    existing_customers=get_customers_birthday()
+                    if reported_birthday in existing_customers:
+                        add_new_rented_car(requested_reg_nr,reported_birthday)
+                        all_info=get_customers_info()
+                        for info in all_info:
+                            if reported_birthday==info[0]:
+                                print("Hello {}\nYou rented\
+ the car {}".format(info[1],requested_reg_nr))
+                    else:
+                        firstname=input("Please write down your first name:\n")
+                        surname=input("Please write down your surname:\n")
+                        email=input("Please leave your e-mail address:\n")
+                        if "@" in email and "." in email:
+                            add_new_customer(reported_birthday,firstname,surname,email)
+                            add_new_rented_car(requested_reg_nr,reported_birthday)
+                            print("Hello {}\nYou rented the car \
+{}".format(firstname,requested_reg_nr))
+                        else:
+                            print("Sorry, email address is invalid.")
+               
+            except:
                 print("Sorry, birthday format invalid.")
-    else:
-        print("Sorry, the register number you submitted is invalid.")
 
 def return_car():
     return_reg_nr=input("Give the register number of the car your want to return:\n")
